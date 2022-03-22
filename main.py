@@ -105,7 +105,9 @@ def SU2_aero(
         )
         batchmode.run_batch()
 
-        ##### Write CFD Config File
+        app.shutdown()
+
+        #### Write CFD Config File
         with open(this_dir / "su2_config_template.cfg") as f:
             su2_config = f.readlines()
 

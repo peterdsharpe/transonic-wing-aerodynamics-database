@@ -18,53 +18,31 @@ airfoil = asb.Airfoil("rae2822")
 #     time.sleep(2 * np.random.rand())
 #     return {'x2': mach ** 2, 'x3': mach ** 3}
 
+def run(mach):
+    print(f"Running mach = {mach}")
+    output = SU2_aero(
+        airfoil=airfoil,
+        Re=6.5e6,
+        mach=mach,
+        alpha=1.0,
+        verbose=False,
+    )
+    output = {
+        "mach": mach,
+        **output
+    }
+    print(output)
+    return output
+
 if __name__ == '__main__':
 
-    machs = np.arange(0.1, 1.3, 0.5)
+    machs = np.arange(0.1, 1.3, 0.02)
 
-    with mp.Pool(np.minimum(mp.cpu_count(), len(machs))) as pool:
-        # raw_outputs = [
-        #     # SU2_aero(
-        #     #     airfoil=airfoil,
-        #     #     Re=6.5e6,
-        #     #     mach=mach,
-        #     #     alpha=1.0
-        #     # )
-        #     {'x2': mach ** 2, 'x3': mach ** 3}
-        #     for mach in machs
-        # ]
+    with mp.Pool(np.minimum(mp.cpu_count() // 2 - 1, len(machs))) as pool:
 
-        for mach, output in pool.imap(
-                lambda mach: (mach, SU2_aero(
-                    airfoil=airfoil,
-                    Re=6.5e6,
-                    mach=mach,
-                    alpha=1.0,
-                    verbose=False,
-                )),
-                # lambda mach: (mach, f(mach)),
+        for output in pool.imap(
+                lambda mach: run(mach=mach),
                 iterable=machs
         ):
-            output = {
-                "mach": mach,
-                **output
-            }
-            print(output)
             with open("mach_sweep.csv", "a+") as f:
                 f.write(json.dumps(output) + "\n")
-
-    # df = pd.DataFrame(
-    #     data=raw_outputs, index=machs
-    # )
-    # df.index.name = "Machs"
-    #
-    # df.to_csv('mach_sweep.csv')
-    #
-    # print(df)
-
-    # outputs = {
-    #     'machs': machs,
-    #     'outputs': raw_outputs
-    # }
-    # with open('mach_sweep.json', 'w+') as f:
-    #     json.dump(outputs, f)
