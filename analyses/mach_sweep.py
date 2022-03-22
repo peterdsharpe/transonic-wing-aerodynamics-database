@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     machs = np.arange(0.1, 1.3, 0.5)
 
-    with mp.Pool(mp.cpu_count() // 2) as pool:
+    with mp.Pool(np.minimum(mp.cpu_count(), len(machs))) as pool:
         # raw_outputs = [
         #     # SU2_aero(
         #     #     airfoil=airfoil,

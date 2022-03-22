@@ -2,3 +2,4 @@ numpy
 scipy
 git+https://github.com/sn1979c/meshio.git@085241c827afbb73a8e5d9bb82b723da0ba260bc
 h5py
+PySide6
